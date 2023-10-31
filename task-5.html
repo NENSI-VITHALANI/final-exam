@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>task-5</title>
+</head>
+
+<body>
+
+
+    <h1>budget</h1>
+
+    <table border="1" style="margin: 40px 0;">
+
+        <tr>
+            <td>Budget</td>
+            <td><input type="text" id="budget" /></td>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td><input type="button" value="submit" onclick="submit()" /></td>
+        </tr>
+    </table>
+    <table border="1" style="margin: 40px 0;">
+        <tr style="display: none;">
+            <td><input type="hidden" id="editid" /></td>
+        </tr>
+        <tr>
+
+            <td>Exname:- </td>
+            <td><input id="Exname" type="text" /></td>
+        </tr>
+        <tr>
+            <td>rs:- </td>
+            <td><input id="rs" type="text" /></td>
+        </tr>
+        <tr>
+
+            <td></td>
+            <td>
+                <button onclick="save()" type="button" id="addbtn">+</button>
+                <button onclick="save()" type="button" id="editbtn">Ed</button>
+
+            </td>
+        </tr>
+    </table>
+    <table border="1">
+        <tr>
+            <td>Name</td>
+            <td>Price</td>
+            <td>Action</td>
+        </tr>
+        <tbody id="record"></tbody>
+    </table>
+
+
+    <table style="margin-top: 50px;" border="1">
+        <tr>
+            <td>Total budget</td>
+            <td><span id="totalBudget">0</span></td>
+        </tr>
+        <tr>
+            <td>Expenses</td>
+            <td><span id="totalExpenses">0</span></td>
+        </tr>
+        <tr>
+            <td>Balance</td>
+            <td><span id="balance">0</span></td>
+        </tr>
+    </table>
+
+
+</body>
+<script type="text/javascript">
+
+
+
+
+    const submit = () => {
+        let budget = document.getElementById('budget').value;
+        localStorage.setItem('budget', budget);
+
+    }
+
+    let data = [];
+    const viewdata = () => {
+        document.getElementById('editbtn').style.display = "none";
+        document.getElementById('addbtn').style.display = "block";
+
+        let record = JSON.parse(localStorage.getItem('user'));
+        let val = (record == null) ? [] : record;
+        let tbl = "";
+        val.map((val) => {
+            const { userid, Exname, rs } = val;
+            tbl +=
+                `
+                 <tr>
+                    <td>${Exname}</td>
+                    <td>${rs}</td>
+                    <td>
+                         <button onclick = "deletedata(${userid})">De</button>                     
+                    <td>
+                        <td>
+                            <button onclick = "editdata(${userid})">ed</button>
+                        </td>
+                 </tr>
+                `
+        })
+        document.getElementById('record').innerHTML = tbl;
+    }
+    viewdata();
+
+    const save = () => {
+        let userid = document.getElementById('editid').value;
+        let Exname = document.getElementById('Exname').value;
+        let rs = document.getElementById('rs').value;
+
+        if (userid) {
+            let val = JSON.parse(localStorage.getItem('user'));
+            let updatedData = val.filter((v) => {
+                if (v.userid == userid) {
+                    v.Exname = Exname;
+                    v.rs = rs;
+                }
+                return v;
+            });
+            localStorage.setItem('user', JSON.stringify(updatedData));
+            alert("update..");
+            document.getElementById('editid').value = "";
+            viewdata();
+        }
+        else {
+            let obj = {
+                userid: Math.floor(Math.random() * 1000),
+                Exname: Exname,
+                rs: rs
+            }
+            if (localStorage.getItem('user') === null || localStorage.getItem('user') === undefined) {
+                data.push(obj);
+                localStorage.setItem('user', JSON.stringify(data));
+            }
+            else {
+                let val = JSON.parse(localStorage.getItem('user'));
+                val.push(obj);
+                localStorage.setItem('user', JSON.stringify(val));
+            }
+
+            alert("added..");
+            viewdata();
+        }
+        document.getElementById('Exname').value = "";
+        document.getElementById('rs').value = "";
+        viewdata();
+
+
+    }
+
+    const deletedata = (id) => {
+        let data = JSON.parse(localStorage.getItem('user'));
+        let ans = data.filter((val) => {
+            return val.userid != id
+        })
+        localStorage.setItem('user', JSON.stringify(ans));
+        alert(" delete");
+        viewdata();
+    }
+
+    const editdata = (id) => {
+        document.getElementById('addbtn').style.display = "none";
+        document.getElementById('editbtn').style.display = "block";
+
+        let val = JSON.parse(localStorage.getItem('user'));
+        let ans = val.filter((v) => {
+            return v.userid == id;
+        })
+
+        document.getElementById('Exname').value = ans[0].Exname;
+        document.getElementById('rs').value = ans[0].rs;
+        document.getElementById('editid').value = ans[0].userid;
+    }
+
+
+</script>
+
+</html>
